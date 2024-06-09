@@ -1,8 +1,10 @@
+import os
+from math import sqrt
+
 import pandas as pd
 from xgboost import XGBRegressor
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error
-from math import sqrt
 
 def cross_validate_model(x, y, model):
     tscv = TimeSeriesSplit(n_splits=5, test_size=5000)
@@ -52,8 +54,6 @@ rmse = sqrt(mse)
 print(f'Mean Squared Error: {round(rmse, 5)}')
 model = XGBRegressor().fit(df_x, df_y)
 
-# Test prediction
-#df_pred = pd.DataFrame([[1, 0, 1, 0, 1, 2024, 3, 3, 3, 1600, 1500]], columns=columns)
-#df_pred['Pred'] = model.predict_proba(df_pred)[:,1]
-
-#print(df_pred)
+# Save model
+os.makedirs('./data/models/', exist_ok=True)
+model.save_model('./data/models/supercomputer.model')
