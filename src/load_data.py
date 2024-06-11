@@ -1,4 +1,5 @@
 import os
+import json
 
 import pandas as pd
 import numpy as np
@@ -24,7 +25,7 @@ def calculate_elo(df, K=32):
         teamB = game.TeamB
 
         # Get winner
-        winA = 1 if game.Points == 3 else 0.5 if game.Points == 1 else 0
+        winA = 1 if game.PointsA == 3 else 0.5 if game.PointsA == 1 else 0
         winB = 1 - winA
 
         # Get ELO stats
@@ -51,7 +52,7 @@ def calculate_elo(df, K=32):
     df['EloA'] = df[['EloA', 'EloB_remove']].values.max(1)
     df['EloB'] = df[['EloB', 'EloA_remove']].values.max(1)
     df = df.drop(['TeamB_remove', 'EloA_remove', 'EloB_remove'], axis=1)
-    return df
+    return df, elos
 
 
 # Load results
@@ -67,8 +68,10 @@ df = df.dropna(axis=0).reset_index(drop=True)
 df = df.reset_index(drop=False).rename({'index' : 'MatchNumber'}, axis=1)
 df_switched = df.copy()
 df_switched[['TeamA', 'TeamB', 'ScoreA', 'ScoreB']] = df_switched[['TeamB', 'TeamA', 'ScoreB', 'ScoreA']]
-df['IsHome'] = 1
-df_switched['IsHome'] = 0
+df['IsHomeA'] = 1
+df['IsHomeB'] = 0
+df_switched['IsHomeA'] = 0
+df_switched['IsHomeB'] = 1
 df = pd.concat([df, df_switched]).sort_values('Date').reset_index(drop=True)
 df = df.reset_index().rename({'index' : 'MatchOrder'}, axis=1)
 
@@ -88,13 +91,19 @@ df['IsEuros'] = df.Tournament.eq('UEFA Euro').astype('int')
 df['Year'] = pd.DatetimeIndex(df.Date).year
 
 # Get form-related features
-df['Points'] = (3 * (df.ScoreA > df.ScoreB)) + (df.ScoreA == df.ScoreB)
-df['Recent3'] = df.groupby('TeamA').rolling(3).Points.sum().droplevel(0).fillna(0).astype(int) - df.Points
-df['Recent5'] = df.groupby('TeamA').rolling(5).Points.sum().droplevel(0).fillna(0).astype(int) - df.Points
-df['Recent10'] = df.groupby('TeamA').rolling(10).Points.sum().droplevel(0).fillna(0).astype(int) - df.Points
+df['PointsA'] = (3 * (df.ScoreA > df.ScoreB)) + (df.ScoreA == df.ScoreB)
+df['PointsB'] = (3 * (df.ScoreB > df.ScoreA)) + (df.ScoreB == df.ScoreA)
+df['Recent3A'] = df.groupby('TeamA').rolling(4).PointsA.sum().droplevel(0).fillna(0).astype(int) - df.PointsA
+df['Recent5A'] = df.groupby('TeamA').rolling(6).PointsA.sum().droplevel(0).fillna(0).astype(int) - df.PointsA
+df['Recent10A'] = df.groupby('TeamA').rolling(11).PointsA.sum().droplevel(0).fillna(0).astype(int) - df.PointsA
+df['Recent3B'] = df.groupby('TeamB').rolling(4).PointsB.sum().droplevel(0).fillna(0).astype(int) - df.PointsB
+df['Recent5B'] = df.groupby('TeamB').rolling(6).PointsB.sum().droplevel(0).fillna(0).astype(int) - df.PointsB
+df['Recent10B'] = df.groupby('TeamB').rolling(11).PointsB.sum().droplevel(0).fillna(0).astype(int) - df.PointsB
 
-df = calculate_elo(df)
+df, elos = calculate_elo(df)
 
 # Save features
 os.makedirs('./data/etl/', exist_ok=True)
 df.to_csv('./data/etl/features.csv', index=False)
+with open('./data/etl/elo.json', 'w', encoding='utf-8') as f:
+    json.dump(elos, f)
