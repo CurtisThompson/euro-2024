@@ -32,4 +32,4 @@ class MatchModel(BaseEstimator):
     
 
     def load_model(self, path):
-        pickle.load(self, open(path, 'rb'))
+        return pickle.load(open(path, 'rb'))
