@@ -1,4 +1,5 @@
 import json
+import copy
 import pandas as pd
 import numpy as np
 
@@ -46,7 +47,7 @@ def add_flag_features(df):
     return df
 
 
-def simulate_round(round_num, df, df_results, elos, model):
+def simulate_round(round_num, df, df_results, elos, model, predict=False):
     # Get fixtures for round
     df_round = df.loc[df.Round == round_num].copy()
 
@@ -56,7 +57,10 @@ def simulate_round(round_num, df, df_results, elos, model):
     # Make predictions
     columns = ['Neutral', 'IsHomeA', 'IsHomeB', 'IsMajorTournament', 'IsFriendly', 'IsEuros', 'Year',
                'Recent3A', 'Recent5A', 'Recent10A', 'Recent3B', 'Recent5B', 'Recent10B', 'EloA', 'EloB']
-    df_round[['ScoreA', 'ScoreB']] = model.predict(df_round[columns])
+    if predict:
+        df_round[['ScoreA', 'ScoreB']] = model.predict(df_round[columns])
+    else:
+        df_round[['ScoreA', 'ScoreB']] = model.simulate(df_round[columns])
     
     # Update elos and points
     df_round['PointsA'] = (3 * (df_round.ScoreA > df_round.ScoreB)) + (df_round.ScoreA == df_round.ScoreB)
@@ -194,6 +198,55 @@ def fill_in_future_fixtures(fixtures, positions):
     return fixtures
 
 
+def simulate_tournament(matches, past_results, elos, model):
+    # Simulate group stages
+    completed_results = pd.DataFrame()
+    for round in range(1, 4):
+        round_res, past_results, elos = simulate_round(round, matches, past_results, elos, model)
+        completed_results = pd.concat([completed_results, round_res])
+    
+    # Get final group positions
+    groups = calculate_groups(completed_results)
+    positions = get_group_positions(groups)
+
+    # Simulate knockouts
+    for round, tag in [(4, 'Q'), (5, 'S'), (6, 'G'), (7, 'Z')]:
+        matches = fill_in_future_fixtures(matches, positions)
+        round_res, past_results, elos = simulate_round(round, matches, past_results, elos, model)
+        completed_results = pd.concat([completed_results, round_res])
+        positions = get_knockout_positions(round_res, tag)
+    
+    return completed_results
+
+
+def simulate_winning_probabilities(matches, past_results, elos, model, sims=1000):
+    winners = {}
+    for i in range(sims):
+        m = matches.copy()
+        r = past_results.copy()
+        e = copy.deepcopy(elos)
+        res = simulate_tournament(m, r, e, model)
+
+        final = res[res.Round == 7].iloc[0]
+
+        if final.ScoreA > final.ScoreB:
+            winner = final.TeamA
+        elif final.ScoreB > final.ScoreA:
+            winner = final.TeamB
+        elif np.random.rand() >= 0.5:
+            winner = final.TeamA
+        else:
+            winner = final.TeamB
+        
+        if winner in winners:
+            winners[winner] += 1
+        else:
+            winners[winner] = 1
+    
+    return winners
+
+
+
 # Load future games in Euros
 df = load_euro_games()
 df = add_flag_features(df)
@@ -204,20 +257,8 @@ df_results, elos = load_results_data()
 # Load model
 model = load_model()
 
-# Simulate tournament
-# Simulate group stages
-completed_results = pd.DataFrame()
-for round in range(1, 4):
-    round_res, df_results, elos = simulate_round(round, df, df_results, elos, model)
-    completed_results = pd.concat([completed_results, round_res])
-# Get final group positions
-groups = calculate_groups(completed_results)
-positions = get_group_positions(groups)
-# Simulate knockouts
-for round, tag in [(4, 'Q'), (5, 'S'), (6, 'G'), (7, 'Z')]:
-    df = fill_in_future_fixtures(df, positions)
-    round_res, df_results, elos = simulate_round(round, df, df_results, elos, model)
-    completed_results = pd.concat([completed_results, round_res])
-    positions = get_knockout_positions(round_res, tag)
-
-print(completed_results.head(50))
+#print(simulate_tournament(df, df_results, elos, model))
+winners = simulate_winning_probabilities(df, df_results, elos, model, sims=10)
+winners = pd.DataFrame(zip(winners.keys(), winners.values()), columns=['Team', 'Wins'])
+winners = winners.sort_values('Wins', ascending=False, ignore_index=True)
+print(winners)
