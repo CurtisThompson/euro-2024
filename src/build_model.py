@@ -1,6 +1,7 @@
 import os
 from math import sqrt
 
+import numpy as np
 import pandas as pd
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error
@@ -27,7 +28,7 @@ def cross_validate_model(x, ya, yb, model):
         model_cv = model.fit(x_train, ya_train, yb_train)
 
         # Evaluate model
-        ya_pred, yb_pred = model_cv.predict(x_test)
+        ya_pred, yb_pred = np.array(model_cv.predict(x_test)).T
         mse += (mean_squared_error(ya_test, ya_pred) + mean_squared_error(yb_test, yb_pred)) / 2
 
     mse /= 5

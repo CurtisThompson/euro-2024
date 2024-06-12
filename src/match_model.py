@@ -24,7 +24,7 @@ class MatchModel(BaseEstimator):
         pred_a = np.round(self.model_a.predict(x)).astype(int)
         pred_b = np.round(self.model_b.predict(x)).astype(int)
 
-        return [pred_a, pred_b]
+        return np.array([pred_a, pred_b]).T
     
 
     def save_model(self, path):

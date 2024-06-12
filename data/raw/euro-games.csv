@@ -1,0 +1,52 @@
+round,date,home_team,away_team,home_score,away_score,tournament,city,country,neutral
+1,2024-06-14,Germany,Scotland,NA,NA,UEFA Euro,Munich,Germany,FALSE
+1,2024-06-15,Hungary,Switzerland,NA,NA,UEFA Euro,Cologne,Germany,TRUE
+1,2024-06-15,Spain,Croatia,NA,NA,UEFA Euro,Berlin,Germany,TRUE
+1,2024-06-15,Italy,Albania,NA,NA,UEFA Euro,Dortmund,Germany,TRUE
+1,2024-06-16,Slovenia,Denmark,NA,NA,UEFA Euro,Stuttgart,Germany,TRUE
+1,2024-06-16,Serbia,England,NA,NA,UEFA Euro,Gelsenkirchen,Germany,TRUE
+1,2024-06-16,Poland,Netherlands,NA,NA,UEFA Euro,Hamburg,Germany,TRUE
+1,2024-06-17,Austria,France,NA,NA,UEFA Euro,Düsseldorf,Germany,TRUE
+1,2024-06-17,Romania,Ukraine,NA,NA,UEFA Euro,Munich,Germany,TRUE
+1,2024-06-17,Belgium,Slovakia,NA,NA,UEFA Euro,Frankfurt,Germany,TRUE
+1,2024-06-18,Turkey,Georgia,NA,NA,UEFA Euro,Dortmund,Germany,TRUE
+1,2024-06-18,Portugal,Czech Republic,NA,NA,UEFA Euro,Leipzig,Germany,TRUE
+2,2024-06-19,Germany,Hungary,NA,NA,UEFA Euro,Stuttgart,Germany,FALSE
+2,2024-06-19,Scotland,Switzerland,NA,NA,UEFA Euro,Cologne,Germany,TRUE
+2,2024-06-19,Croatia,Albania,NA,NA,UEFA Euro,Hamburg,Germany,TRUE
+2,2024-06-20,Spain,Italy,NA,NA,UEFA Euro,Gelsenkirchen,Germany,TRUE
+2,2024-06-20,Slovenia,Serbia,NA,NA,UEFA Euro,Munich,Germany,TRUE
+2,2024-06-20,Denmark,England,NA,NA,UEFA Euro,Frankfurt,Germany,TRUE
+2,2024-06-21,Poland,Austria,NA,NA,UEFA Euro,Berlin,Germany,TRUE
+2,2024-06-21,Netherlands,France,NA,NA,UEFA Euro,Leipzig,Germany,TRUE
+2,2024-06-21,Slovakia,Ukraine,NA,NA,UEFA Euro,Düsseldorf,Germany,TRUE
+2,2024-06-22,Belgium,Romania,NA,NA,UEFA Euro,Cologne,Germany,TRUE
+2,2024-06-22,Georgia,Czech Republic,NA,NA,UEFA Euro,Hamburg,Germany,TRUE
+2,2024-06-22,Turkey,Portugal,NA,NA,UEFA Euro,Dortmund,Germany,TRUE
+3,2024-06-23,Germany,Switzerland,NA,NA,UEFA Euro,Frankfurt,Germany,FALSE
+3,2024-06-23,Scotland,Hungary,NA,NA,UEFA Euro,Stuttgart,Germany,TRUE
+3,2024-06-24,Albania,Spain,NA,NA,UEFA Euro,Düsseldorf,Germany,TRUE
+3,2024-06-24,Croatia,Italy,NA,NA,UEFA Euro,Leipzig,Germany,TRUE
+3,2024-06-25,England,Slovenia,NA,NA,UEFA Euro,Cologne,Germany,TRUE
+3,2024-06-25,Denmark,Serbia,NA,NA,UEFA Euro,Munich,Germany,TRUE
+3,2024-06-25,Netherlands,Austria,NA,NA,UEFA Euro,Berlin,Germany,TRUE
+3,2024-06-25,France,Poland,NA,NA,UEFA Euro,Dortmund,Germany,TRUE
+3,2024-06-26,Slovakia,Romania,NA,NA,UEFA Euro,Frankfurt,Germany,TRUE
+3,2024-06-26,Ukraine,Belgium,NA,NA,UEFA Euro,Stuttgart,Germany,TRUE
+3,2024-06-26,Georgia,Portugal,NA,NA,UEFA Euro,Gelsenkirchen,Germany,TRUE
+3,2024-06-26,Czech Republic,Turkey,NA,NA,UEFA Euro,Hamburg,Germany,TRUE
+4,2024-06-29,A2,B2,NA,NA,UEFA Euro,Berlin,Germany,TRUE
+4,2024-06-29,A1,C2,NA,NA,UEFA Euro,Dortmund,Germany,TRUE
+4,2024-06-30,C1,X4,NA,NA,UEFA Euro,Gelsenkirchen,Germany,TRUE
+4,2024-06-30,B1,X1,NA,NA,UEFA Euro,Cologne,Germany,TRUE
+4,2024-07-01,D2,E2,NA,NA,UEFA Euro,Düsseldorf,Germany,TRUE
+4,2024-07-01,F1,X2,NA,NA,UEFA Euro,Frankfurt,Germany,TRUE
+4,2024-07-02,E1,X3,NA,NA,UEFA Euro,Munich,Germany,TRUE
+4,2024-07-02,D1,F2,NA,NA,UEFA Euro,Leipzig,Germany,TRUE
+5,2024-07-05,Q1,Q2,NA,NA,UEFA Euro,Stuttgart,Germany,TRUE
+5,2024-07-05,Q3,Q4,NA,NA,UEFA Euro,Hamburg,Germany,TRUE
+5,2024-07-06,Q5,Q6,NA,NA,UEFA Euro,Berlin,Germany,TRUE
+5,2024-07-06,Q7,Q8,NA,NA,UEFA Euro,Düsseldorf,Germany,TRUE
+6,2024-07-09,S1,S2,NA,NA,UEFA Euro,Munich,Germany,TRUE
+6,2024-07-10,S3,S4,NA,NA,UEFA Euro,Dortmund,Germany,TRUE
+7,2024-07-14,G1,G2,NA,NA,UEFA Euro,Berlin,Germany,TRUE
