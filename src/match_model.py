@@ -27,6 +27,24 @@ class MatchModel(BaseEstimator):
         return np.array([pred_a, pred_b]).T
     
 
+    def simulate(self, x):
+        # Get predictions
+        pred_a = self.model_a.predict(x)
+        pred_b = self.model_b.predict(x)
+
+        # Add variance
+        pred_a = pred_a + np.random.normal(loc=0, scale=0.3, size=len(pred_a))
+        pred_b = pred_a + np.random.normal(loc=0, scale=0.3, size=len(pred_b))
+
+        # Tidy preds
+        pred_a[pred_a < 0] = 0
+        pred_a = np.round(pred_a).astype(int)
+        pred_b[pred_a < 0] = 0
+        pred_b = np.round(pred_b).astype(int)
+
+        return np.array([pred_a, pred_b]).T
+    
+
     def save_model(self, path):
         pickle.dump(self, open(path, 'wb'))
     
