@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error
+from hyperopt import STATUS_OK, Trials, fmin, hp, tpe
 
 from match_model import MatchModel
 
@@ -35,22 +36,58 @@ def cross_validate_model(x, ya, yb, model):
     return mse
 
 
+def find_best_hyperparameters(df_x, df_ya, df_yb, max_evals=100):
+    def objective(space):
+        model = MatchModel(**space)
+        mse = cross_validate_model(df_x, df_ya, df_yb, model)
+        rmse = sqrt(mse)
+        return {'loss': rmse, 'status': STATUS_OK}
+
+    # Hyperparameter space
+    space = {
+        'max_depth' : hp.uniformint('max_depth', 3, 19),
+        'gamma' : hp.uniform('gamma', 1, 9),
+        'reg_alpha' : hp.uniform('reg_alpha', 1, 100),
+        'reg_lambda' : hp.uniform('reg_lambda', 0, 1),
+        'colsample_bytree' : hp.uniform('colsample_bytree', 0.5, 1),
+        'min_child_weight' : hp.uniform('min_child_weight', 0, 10,),
+        'n_estimators' : hp.uniformint('n_estimators', 10, 1000),
+        'seed' : 0
+    }
+
+    # Find best hyperparameters
+    trials = Trials()
+    best_hyperparameters = fmin(fn=objective,
+                                space=space,
+                                algo=tpe.suggest,
+                                max_evals=max_evals,
+                                trials=trials)
+    print('RMSE:', min(trials.losses()))
+    print(best_hyperparameters)
+    return best_hyperparameters
+
+
 # Load data
 df = pd.read_csv('./data/etl/features.csv')
 
 # Choose features
 columns = ['Neutral', 'IsHomeA', 'IsHomeB', 'IsMajorTournament', 'IsFriendly', 'IsEuros', 'Year',
-           'Recent3A', 'Recent5A', 'Recent10A', 'Recent3B', 'Recent5B', 'Recent10B', 'EloA', 'EloB']
+           'Recent3A', 'Recent5A', 'Recent10A', 'Recent3B', 'Recent5B', 'Recent10B',
+           'RecentGF10A', 'RecentGA10A', 'RecentGF10B', 'RecentGA10B', 'EloA', 'EloB']
 df_x = df[columns]
 df_ya = df['ScoreA']
 df_yb = df['ScoreB']
 
 # Cross validate and fit model
-model = MatchModel()
-mse = cross_validate_model(df_x, df_ya, df_yb, model)
-rmse = sqrt(mse)
-print(f'Mean Squared Error: {round(rmse, 5)}')
-model = MatchModel().fit(df_x, df_ya, df_yb)
+tune_model = False
+if tune_model:
+    params = find_best_hyperparameters(df_x, df_ya, df_yb)
+    model = MatchModel(**params).fit(df_x, df_ya, df_yb)
+else:
+    model = MatchModel()
+    mse = cross_validate_model(df_x, df_ya, df_yb, model)
+    rmse = sqrt(mse)
+    print(f'Mean Squared Error: {round(rmse, 5)}')
 
 # Save model
 os.makedirs('./data/models/', exist_ok=True)

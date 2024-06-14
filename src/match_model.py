@@ -33,8 +33,8 @@ class MatchModel(BaseEstimator):
         pred_b = self.model_b.predict(x)
 
         # Add variance
-        pred_a = pred_a + np.random.normal(loc=0, scale=0.3, size=len(pred_a))
-        pred_b = pred_a + np.random.normal(loc=0, scale=0.3, size=len(pred_b))
+        pred_a = pred_a + np.random.normal(loc=0, scale=0.1, size=len(pred_a))
+        pred_b = pred_a + np.random.normal(loc=0, scale=0.1, size=len(pred_b))
 
         # Tidy preds
         pred_a[pred_a < 0] = 0
