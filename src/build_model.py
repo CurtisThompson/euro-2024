@@ -138,7 +138,7 @@ def build_model(verbose=True):
     :param verbose: Whether to output progress, defaults to True
     
     :type verbose: bool"""
-    
+
     # Load data
     df = pd.read_csv('./data/etl/features.csv')
 
@@ -176,3 +176,7 @@ def build_model(verbose=True):
     # Save model
     os.makedirs('./data/models/', exist_ok=True)
     model.save_model('./data/models/supercomputer.model')
+
+
+if __name__ == '__main__':
+    build_model()
