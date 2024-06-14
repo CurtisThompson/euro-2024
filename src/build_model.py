@@ -84,7 +84,14 @@ if tune_model:
     params = find_best_hyperparameters(df_x, df_ya, df_yb)
     model = MatchModel(**params).fit(df_x, df_ya, df_yb)
 else:
-    model = MatchModel()
+    params = {'colsample_bytree': 0.9968363907025145,
+              'gamma': 3.7964109350382604,
+              'max_depth': 4,
+              'min_child_weight': 5.046692046533741,
+              'n_estimators': 275,
+              'reg_alpha': 14.716401696781382,
+              'reg_lambda': 0.4974731068232508}
+    model = MatchModel(**params)
     mse = cross_validate_model(df_x, df_ya, df_yb, model)
     rmse = sqrt(mse)
     print(f'Mean Squared Error: {round(rmse, 5)}')
