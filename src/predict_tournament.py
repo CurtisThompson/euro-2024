@@ -434,7 +434,8 @@ def predict_tournament(sims=1000, verbose=True):
     winners, simmed_matches = simulate_winning_probabilities(df, df_results, elos, model, sims=sims)
     winners = pd.DataFrame(zip(winners.keys(), winners.values()), columns=['Team', 'Wins'])
     winners = winners.sort_values('Wins', ascending=False, ignore_index=True)
-    print(winners)
+    if verbose:
+        print(winners)
 
     # Save simmed results
     os.makedirs('./data/sim/', exist_ok=True)
@@ -442,4 +443,4 @@ def predict_tournament(sims=1000, verbose=True):
 
 
 if __name__ == '__main__':
-    predict_tournament()
+    predict_tournament(sims=10)
