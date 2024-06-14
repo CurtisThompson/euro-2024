@@ -102,8 +102,13 @@ def rolling_sum_feature(df, group, window, feature):
     )
 
 
-def process_results():
-    """Load raw results csv and calculate related features."""
+def process_results(verbose=True):
+    """Load raw results csv and calculate related features.
+    
+    :param verbose: Whether to output progress
+    
+    :type verbose: bool
+    """
     # Load results
     df = pd.read_csv('./data/raw/results.csv')
 
@@ -159,7 +164,7 @@ def process_results():
     df['RecentGF10B'] = rolling_sum_feature(df, 'TeamB', 11, 'ScoreB') - df.ScoreB
     df['RecentGA10B'] = rolling_sum_feature(df, 'TeamB', 11, 'ScoreA') - df.ScoreA
 
-    df, elos = calculate_elo(df)
+    df, elos = calculate_elo(df, verbose=verbose)
     df['EloDiff'] = df['EloA'] - df['EloB']
 
     # Save features

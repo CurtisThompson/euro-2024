@@ -132,12 +132,17 @@ def find_best_hyperparameters(df_x, df_ya, df_yb, max_evals=100, verbose=True):
     return best_hyperparameters
 
 
-def build_model(verbose=True):
+def build_model(verbose=True, tune_model=False, tuning_evals=100):
     """Load training data, fit model, and save to file.
     
     :param verbose: Whether to output progress, defaults to True
+    :param tune_model: Whether to perform hyperparameter tuning
+    :param tuning_evals: Maximum number of models to evaluate, defaults to 100
     
-    :type verbose: bool"""
+    :type verbose: bool
+    :type tune_model: bool
+    :type tuning_evals: int
+    """
 
     # Load data
     df = pd.read_csv('./data/etl/features.csv')
@@ -153,9 +158,10 @@ def build_model(verbose=True):
     df_yb = df['ScoreB']
 
     # Cross validate and fit model
-    tune_model = False
     if tune_model:
-        params = find_best_hyperparameters(df_x, df_ya, df_yb, verbose=verbose)
+        params = find_best_hyperparameters(df_x, df_ya, df_yb,
+                                           max_evals=tuning_evals,
+                                           verbose=verbose)
         model = MatchModel(**params).fit(df_x, df_ya, df_yb)
     else:
         params = {'colsample_bytree': 0.8303200756641117, 
