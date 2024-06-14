@@ -99,6 +99,10 @@ df['Recent10A'] = df.groupby('TeamA').rolling(11).PointsA.sum().droplevel(0).fil
 df['Recent3B'] = df.groupby('TeamB').rolling(4).PointsB.sum().droplevel(0).fillna(0).astype(int) - df.PointsB
 df['Recent5B'] = df.groupby('TeamB').rolling(6).PointsB.sum().droplevel(0).fillna(0).astype(int) - df.PointsB
 df['Recent10B'] = df.groupby('TeamB').rolling(11).PointsB.sum().droplevel(0).fillna(0).astype(int) - df.PointsB
+df['RecentGF10A'] = df.groupby('TeamA').rolling(11).ScoreA.sum().droplevel(0).fillna(0).astype(int) - df.ScoreA
+df['RecentGA10A'] = df.groupby('TeamA').rolling(11).ScoreB.sum().droplevel(0).fillna(0).astype(int) - df.ScoreB
+df['RecentGF10B'] = df.groupby('TeamB').rolling(11).ScoreB.sum().droplevel(0).fillna(0).astype(int) - df.ScoreB
+df['RecentGA10B'] = df.groupby('TeamB').rolling(11).ScoreA.sum().droplevel(0).fillna(0).astype(int) - df.ScoreA
 
 df, elos = calculate_elo(df)
 

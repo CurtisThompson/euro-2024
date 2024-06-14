@@ -56,7 +56,8 @@ def simulate_round(round_num, df, df_results, elos, model, predict=False):
 
     # Make predictions
     columns = ['Neutral', 'IsHomeA', 'IsHomeB', 'IsMajorTournament', 'IsFriendly', 'IsEuros', 'Year',
-               'Recent3A', 'Recent5A', 'Recent10A', 'Recent3B', 'Recent5B', 'Recent10B', 'EloA', 'EloB']
+               'Recent3A', 'Recent5A', 'Recent10A', 'Recent3B', 'Recent5B', 'Recent10B',
+               'RecentGF10A', 'RecentGA10A', 'RecentGF10B', 'RecentGA10B', 'EloA', 'EloB']
     if predict:
         df_round[['ScoreA', 'ScoreB']] = model.predict(df_round[columns])
     else:
@@ -73,11 +74,15 @@ def simulate_round(round_num, df, df_results, elos, model, predict=False):
                  'ScoreB', 'EloA', 'EloB',
                  'Recent3A', 'Recent5A', 'Recent10A',
                  'Recent3B', 'Recent5B', 'Recent10B',
-                 'TeamA', 'TeamB', 'PointsA', 'PointsB']] = df_switched[['IsHomeB', 'IsHomeA', 'ScoreB',
-                                                                         'ScoreA', 'EloB', 'EloA',
-                                                                         'Recent3B', 'Recent5B', 'Recent10B',
-                                                                         'Recent3A', 'Recent5A', 'Recent10A',
-                                                                         'TeamB', 'TeamA', 'PointsB', 'PointsA']]
+                 'TeamA', 'TeamB', 'PointsA', 'PointsB',
+                 'RecentGF10A', 'RecentGA10A',
+                 'RecentGF10B', 'RecentGA10B']] = df_switched[['IsHomeB', 'IsHomeA', 'ScoreB',
+                                                               'ScoreA', 'EloB', 'EloA',
+                                                               'Recent3B', 'Recent5B', 'Recent10B',
+                                                               'Recent3A', 'Recent5A', 'Recent10A',
+                                                               'TeamB', 'TeamA', 'PointsB', 'PointsA',
+                                                               'RecentGF10B', 'RecentGA10B',
+                                                               'RecentGF10A', 'RecentGA10A']]
     df_results = pd.concat([df_results, df_round, df_switched], ignore_index=True)
 
     # Return everything
@@ -91,6 +96,10 @@ def calculate_round_features(df, df_results, elos):
     df['Recent5B'] = df.TeamB.apply(lambda x: df_results.loc[df_results.TeamA == x, 'PointsA'].tail(5).sum())
     df['Recent10A'] = df.TeamA.apply(lambda x: df_results.loc[df_results.TeamA == x, 'PointsA'].tail(10).sum())
     df['Recent10B'] = df.TeamB.apply(lambda x: df_results.loc[df_results.TeamA == x, 'PointsA'].tail(10).sum())
+    df['RecentGF10A'] = df.TeamA.apply(lambda x: df_results.loc[df_results.TeamA == x, 'ScoreA'].tail(10).sum())
+    df['RecentGA10A'] = df.TeamA.apply(lambda x: df_results.loc[df_results.TeamA == x, 'ScoreB'].tail(10).sum())
+    df['RecentGF10B'] = df.TeamB.apply(lambda x: df_results.loc[df_results.TeamA == x, 'ScoreA'].tail(10).sum())
+    df['RecentGA10B'] = df.TeamB.apply(lambda x: df_results.loc[df_results.TeamA == x, 'ScoreB'].tail(10).sum())
     df['EloA'] = df.TeamA.map(elos)
     df['EloB'] = df.TeamB.map(elos)
 
