@@ -105,6 +105,7 @@ df['RecentGF10B'] = df.groupby('TeamB').rolling(11).ScoreB.sum().droplevel(0).fi
 df['RecentGA10B'] = df.groupby('TeamB').rolling(11).ScoreA.sum().droplevel(0).fillna(0).astype(int) - df.ScoreA
 
 df, elos = calculate_elo(df)
+df['EloDiff'] = df['EloA'] - df['EloB']
 
 # Save features
 os.makedirs('./data/etl/', exist_ok=True)

@@ -58,7 +58,7 @@ def simulate_round(round_num, df, df_results, elos, model, predict=False):
     # Make predictions
     columns = ['Neutral', 'IsHomeA', 'IsHomeB', 'IsMajorTournament', 'IsFriendly', 'IsEuros', 'Year',
                'Recent3A', 'Recent5A', 'Recent10A', 'Recent3B', 'Recent5B', 'Recent10B',
-               'RecentGF10A', 'RecentGA10A', 'RecentGF10B', 'RecentGA10B', 'EloA', 'EloB']
+               'RecentGF10A', 'RecentGA10A', 'RecentGF10B', 'RecentGA10B', 'EloA', 'EloB', 'EloDiff']
     if predict:
         df_round[['ScoreA', 'ScoreB']] = model.predict(df_round[columns])
     else:
@@ -84,6 +84,7 @@ def simulate_round(round_num, df, df_results, elos, model, predict=False):
                                                                'TeamB', 'TeamA', 'PointsB', 'PointsA',
                                                                'RecentGF10B', 'RecentGA10B',
                                                                'RecentGF10A', 'RecentGA10A']]
+    df_switched['EloDiff'] = 0 - df_switched['EloDiff']
     df_results = pd.concat([df_results, df_round, df_switched], ignore_index=True)
 
     # Return everything
@@ -103,6 +104,7 @@ def calculate_round_features(df, df_results, elos):
     df['RecentGA10B'] = df.TeamB.apply(lambda x: df_results.loc[df_results.TeamA == x, 'ScoreB'].tail(10).sum())
     df['EloA'] = df.TeamA.map(elos)
     df['EloB'] = df.TeamB.map(elos)
+    df['EloDiff'] = df.EloA - df.EloB
 
     return df
 
