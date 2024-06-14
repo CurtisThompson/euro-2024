@@ -1,3 +1,4 @@
+import os
 import json
 import copy
 import pandas as pd
@@ -230,14 +231,18 @@ def simulate_tournament(matches, past_results, elos, model):
 
 def simulate_winning_probabilities(matches, past_results, elos, model, sims=1000):
     winners = {}
+    simmed_matches = pd.DataFrame()
     for i in range(sims):
+        # Clone pre-tournament data
         m = matches.copy()
         r = past_results.copy()
         e = copy.deepcopy(elos)
+
+        # Simulat tournament
         res = simulate_tournament(m, r, e, model)
 
+        # Get winner
         final = res[res.Round == 7].iloc[0]
-
         if final.ScoreA > final.ScoreB:
             winner = final.TeamA
         elif final.ScoreB > final.ScoreA:
@@ -247,12 +252,15 @@ def simulate_winning_probabilities(matches, past_results, elos, model, sims=1000
         else:
             winner = final.TeamB
         
+        # Store winner and simmed results
         if winner in winners:
             winners[winner] += 1
         else:
             winners[winner] = 1
+        res['Simulation'] = i
+        simmed_matches = pd.concat([simmed_matches, res])
     
-    return winners
+    return winners, simmed_matches
 
 
 
@@ -267,7 +275,12 @@ df_results, elos = load_results_data()
 model = load_model()
 
 #print(simulate_tournament(df, df_results, elos, model))
-winners = simulate_winning_probabilities(df, df_results, elos, model, sims=10)
+# Simulate tournament many times
+winners, simmed_matches = simulate_winning_probabilities(df, df_results, elos, model, sims=10)
 winners = pd.DataFrame(zip(winners.keys(), winners.values()), columns=['Team', 'Wins'])
 winners = winners.sort_values('Wins', ascending=False, ignore_index=True)
 print(winners)
+
+# Save simmed results
+os.makedirs('./data/sim/', exist_ok=True)
+simmed_matches.to_csv('./data/sim/simmed_matches.csv', index=False)
