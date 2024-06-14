@@ -1,50 +1,65 @@
 import pickle
-from sklearn.base import BaseEstimator
 import numpy as np
 from xgboost import XGBRegressor
-from sklearn.linear_model import LinearRegression
-from sklearn.neighbors import KNeighborsRegressor
+from sklearn.base import BaseEstimator
 from sklearn.multioutput import MultiOutputRegressor
-from sklearn.preprocessing import StandardScaler
 
 
 class MatchModel(BaseEstimator):
+    """A machine learning model to predict the output of football matches.
+    The model has two outputs for the home and away scores."""
 
     def __init__(self, **kwargs):
-        #self.model_a = XGBRegressor()#XGBRegressor(**kwargs)
-        #self.model_b = XGBRegressor()#XGBRegressor(**kwargs)
-        #self.scaler = StandardScaler()
+        """Constructor method"""
         self.model = MultiOutputRegressor(XGBRegressor(**kwargs))
     
 
     def fit(self, x, ya, yb):
+        """Fit the model to data
+
+        :param x: Input data
+        :param ya: Home scores
+        :param yb: Away scores
+
+        :type x: Pandas DataFrame
+        :type ya: Array-like of int
+        :type yb: Array-like of int
+
+        :return: Fitted model
+        :rtype: MatchModel
+        """
         # Fit models
-        #self.model_a = self.model_a.fit(x, ya)
-        #self.model_b = self.model_b.fit(x, yb)
         y = np.array([ya, yb]).T
-        #self.scaler = self.scaler.fit(x)
-        #x_temp = self.scaler.transform(x)
-        #x_temp[:,19] *= 5
         self.model = self.model.fit(x, y)
 
         return self
     
 
     def predict(self, x):
-        # Get predictions
-        #pred_a = np.round(self.model_a.predict(x)).astype(int)
-        #pred_b = np.round(self.model_b.predict(x)).astype(int)
-        #x_temp = self.scaler.transform(x)
-        #x_temp[:,19] *= 5
-        preds = np.round(self.model.predict(x)).astype(int)
+        """Predict match score (without added randomness).
 
-        return preds#np.array([pred_a, pred_b]).T
+        :param x: Features to predict on
+
+        :type x: Pandas DataFrame
+
+        :return: Score predictions
+        :rtype: NumPy array
+        """
+        preds = np.round(self.model.predict(x)).astype(int)
+        return preds
     
 
     def simulate(self, x):
+        """Predict match score with added randomness
+
+        :param x: Features to predict on
+
+        :type x: Pandas DataFrame
+
+        :return: Score predictions
+        :rtype: NumPy array
+        """
         # Get predictions
-        #pred_a = self.model_a.predict(x)
-        #pred_b = self.model_b.predict(x)
         preds = self.predict(x)
         pred_a = preds[:,0]
         pred_b = preds[:,1]
@@ -63,8 +78,23 @@ class MatchModel(BaseEstimator):
     
 
     def save_model(self, path):
+        """Save model to file.
+
+        :param path: File path to model
+        
+        :type path: str
+        """
         pickle.dump(self, open(path, 'wb'))
     
 
     def load_model(self, path):
+        """Load model from file.
+
+        :param path: File path to model
+        
+        :type path: str
+
+        :return: Loaded model
+        :rtype: MatchModel
+        """
         return pickle.load(open(path, 'rb'))
