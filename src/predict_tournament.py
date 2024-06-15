@@ -4,7 +4,7 @@ import copy
 import pandas as pd
 import numpy as np
 
-from match_model import MatchModel
+from src.match_model import MatchModel
 
 
 def load_euro_games():
@@ -322,18 +322,20 @@ def fill_in_future_fixtures(fixtures, positions):
     return fixtures
 
 
-def simulate_tournament(matches, past_results, elos, model):
+def simulate_tournament(matches, past_results, elos, model, no_randomness=False):
     """Simulate results for the entire tournament.
 
     :param matches: Tournament fixtures
     :param past_results: Previous football match results
     :param elos: Current Elo scores for each team
     :param model: Model to predict match scores
+    :param no_randomness: Whether to remove added randomness, defaults to False
 
     :type matches: Pandas DataFrame
     :type past_results: Pandas DataFrame
     :type elos: dict
     :type model: MatchModel
+    :type no_randomness: bool
 
     :return: Simulated results for the tournament
     :rtype: Pandas DataFrame
@@ -341,7 +343,12 @@ def simulate_tournament(matches, past_results, elos, model):
     # Simulate group stages
     completed_results = pd.DataFrame()
     for round in range(1, 4):
-        round_res, past_results, elos = simulate_round(round, matches, past_results, elos, model)
+        round_res, past_results, elos = simulate_round(round,
+                                                       matches,
+                                                       past_results,
+                                                       elos,
+                                                       model,
+                                                       predict=no_randomness)
         completed_results = pd.concat([completed_results, round_res])
     
     # Get final group positions
@@ -351,14 +358,20 @@ def simulate_tournament(matches, past_results, elos, model):
     # Simulate knockouts
     for round, tag in [(4, 'Q'), (5, 'S'), (6, 'G'), (7, 'Z')]:
         matches = fill_in_future_fixtures(matches, positions)
-        round_res, past_results, elos = simulate_round(round, matches, past_results, elos, model)
+        round_res, past_results, elos = simulate_round(round,
+                                                       matches,
+                                                       past_results,
+                                                       elos,
+                                                       model,
+                                                       predict=no_randomness)
         completed_results = pd.concat([completed_results, round_res])
         positions = get_knockout_positions(round_res, tag)
     
     return completed_results
 
 
-def simulate_winning_probabilities(matches, past_results, elos, model, sims=1000):
+def simulate_winning_probabilities(matches, past_results, elos, model, sims=1000,
+                                   no_randomness=False):
     """Get tournament winner probabilities via simulation.
     
     
@@ -367,18 +380,20 @@ def simulate_winning_probabilities(matches, past_results, elos, model, sims=1000
     :param elos: Current Elo scores for each team
     :param model: Model to predict match scores
     :param sims: Number of simulations to run
+    :param no_randomness: Whether to remove added randomness, defaults to False
 
     :type matches: Pandas DataFrame
     :type past_results: Pandas DataFrame
     :type elos: dict
     :type model: MatchModel
     :type sims: int
+    :type no_randomness: bool
 
     :return: Winner probabilities and simulated fixtures
-    :rtype: (dict, Pandas DataFrame)
+    :rtype: (Pandas DataFrame, Pandas DataFrame)
     """
-    winners = {}
-    simmed_matches = pd.DataFrame()
+    winners = []
+    simmed_matches = []
     for i in range(sims):
         # Clone pre-tournament data
         m = matches.copy()
@@ -386,7 +401,7 @@ def simulate_winning_probabilities(matches, past_results, elos, model, sims=1000
         e = copy.deepcopy(elos)
 
         # Simulate tournament
-        res = simulate_tournament(m, r, e, model)
+        res = simulate_tournament(m, r, e, model, no_randomness=no_randomness)
 
         # Get winner
         final = res[res.Round == 7].iloc[0]
@@ -400,25 +415,26 @@ def simulate_winning_probabilities(matches, past_results, elos, model, sims=1000
             winner = final.TeamB
         
         # Store winner and simmed results
-        if winner in winners:
-            winners[winner] += 1
-        else:
-            winners[winner] = 1
+        winners.append([i, winner])
         res['Simulation'] = i
-        simmed_matches = pd.concat([simmed_matches, res])
+        simmed_matches.append(res)
     
+    simmed_matches = pd.concat(simmed_matches)
+    winners = pd.DataFrame(winners, columns=['Simulation', 'Winner'])
     return winners, simmed_matches
 
 
-def predict_tournament(sims=1000, verbose=True):
+def predict_tournament(sims=1000, verbose=True, no_randomness=False):
     """Simulate tournament multiple times and get winner probabilities, as
         well as save all simulated results to file.
     
     :param sims: Number of simulations to run, defaults to 1000
     :param verbose: Whether to output intermediary stats, defaults to True
+    :param no_randomness: Whether to remove added randomness, defaults to False
 
     :type sims: int
     :type verbose: bool
+    :type no_randomness: bool
     """
     # Load future games in Euros
     df = load_euro_games()
@@ -431,15 +447,21 @@ def predict_tournament(sims=1000, verbose=True):
     model = load_model()
 
     # Simulate tournament many times
-    winners, simmed_matches = simulate_winning_probabilities(df, df_results, elos, model, sims=sims)
-    winners = pd.DataFrame(zip(winners.keys(), winners.values()), columns=['Team', 'Wins'])
-    winners = winners.sort_values('Wins', ascending=False, ignore_index=True)
+    winners, simmed_matches = simulate_winning_probabilities(df,
+                                                             df_results,
+                                                             elos,
+                                                             model,
+                                                             sims=sims,
+                                                             no_randomness=no_randomness)
+    #winners = pd.DataFrame(zip(winners.keys(), winners.values()), columns=['Team', 'Wins'])
+    #winners = winners.sort_values('Wins', ascending=False, ignore_index=True)
     if verbose:
-        print(winners)
+        print(winners.groupby('Winner')['Simulation'].count())
 
     # Save simmed results
     os.makedirs('./data/sim/', exist_ok=True)
     simmed_matches.to_csv('./data/sim/simmed_matches.csv', index=False)
+    winners.to_csv('./data/sim/sim_winners.csv', index=False)
 
 
 if __name__ == '__main__':

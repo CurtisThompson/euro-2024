@@ -7,7 +7,7 @@ from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error
 from hyperopt import STATUS_OK, Trials, fmin, hp, tpe
 
-from match_model import MatchModel
+from src.match_model import MatchModel
 
 
 def cross_validate_model(x, ya, yb, model, n_splits=5):
@@ -126,6 +126,9 @@ def find_best_hyperparameters(df_x, df_ya, df_yb, max_evals=100, verbose=True):
                                 algo=tpe.suggest,
                                 max_evals=max_evals,
                                 trials=trials)
+    best_hyperparameters['max_depth'] = int(best_hyperparameters['max_depth'])
+    best_hyperparameters['n_estimators'] = int(best_hyperparameters['n_estimators'])
+    best_hyperparameters['random_state'] = int(best_hyperparameters['random_state'])
     if verbose:
         print('RMSE:', min(trials.losses()))
         print(best_hyperparameters)
@@ -164,13 +167,13 @@ def build_model(verbose=True, tune_model=False, tuning_evals=100):
                                            verbose=verbose)
         model = MatchModel(**params).fit(df_x, df_ya, df_yb)
     else:
-        params = {'colsample_bytree': 0.8303200756641117, 
-                  'gamma': 1.2532646140877886,
-                  'max_depth': 3,
-                  'min_child_weight': 6.846057210847509,
-                  'n_estimators': 467,
-                  'reg_alpha': 24.62822865873158,
-                  'reg_lambda': 0.016366596430151065}
+        params = {'colsample_bytree': 0.6538805952085199,
+                  'gamma': 6.134497295290903,
+                  'max_depth': 7,
+                  'min_child_weight': 7.997026598007185,
+                  'n_estimators': 284,
+                  'reg_alpha': 12.15465344647885,
+                  'reg_lambda': 0.8487280985614096}
         model = MatchModel(**params)
         mse, mse_a, mse_b, mse_diff, draws = cross_validate_model(df_x, df_ya, df_yb, model)
         rmse = sqrt(mse)
