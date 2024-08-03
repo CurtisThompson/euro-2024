@@ -1,0 +1,16 @@
+round,date,home_team,away_team,home_score,away_score,tournament,city,country,neutral
+1,2024-06-14,Switzerland,Italy,NA,NA,UEFA Euro,Munich,Germany,FALSE
+1,2024-06-15,Germany,Denmark,NA,NA,UEFA Euro,Cologne,Germany,TRUE
+1,2024-06-15,England,Slovakia,NA,NA,UEFA Euro,Berlin,Germany,TRUE
+1,2024-06-15,Spain,Georgia,NA,NA,UEFA Euro,Dortmund,Germany,TRUE
+1,2024-06-16,France,Belgium,NA,NA,UEFA Euro,Stuttgart,Germany,TRUE
+1,2024-06-16,Portugal,Slovenia,NA,NA,UEFA Euro,Gelsenkirchen,Germany,TRUE
+1,2024-06-16,Romania,Netherlands,NA,NA,UEFA Euro,Hamburg,Germany,TRUE
+1,2024-06-17,Austria,Turkey,NA,NA,UEFA Euro,Düsseldorf,Germany,TRUE
+1,2024-06-17,Spain,Germany,NA,NA,UEFA Euro,Munich,Germany,TRUE
+1,2024-06-17,Portugal,France,NA,NA,UEFA Euro,Frankfurt,Germany,TRUE
+1,2024-06-18,Netherlands,Turkey,NA,NA,UEFA Euro,Dortmund,Germany,TRUE
+1,2024-06-18,England,Switzerland,NA,NA,UEFA Euro,Leipzig,Germany,TRUE
+1,2024-06-19,Spain,France,NA,NA,UEFA Euro,Stuttgart,Germany,FALSE
+1,2024-06-19,Netherlands,England,NA,NA,UEFA Euro,Cologne,Germany,TRUE
+1,2024-06-19,Spain,England,NA,NA,UEFA Euro,Hamburg,Germany,TRUE
