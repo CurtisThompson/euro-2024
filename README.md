@@ -56,7 +56,3 @@ The model is a multi-output [XGBoost regressor](https://xgboost.readthedocs.io/e
 |EloDiff|float|Elo rating difference between Team A and Team B|
 
 The model has a root mean squared error (RMSE) of 1.26808 when evaluated on predicted scores.
-
-## Predictions
-
-Predictions will be updated as the tournament progresses.
